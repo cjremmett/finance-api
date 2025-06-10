@@ -1,0 +1,6 @@
+services:
+  finance-api:
+    build: .
+    container_name: finance-api
+    network_mode: "host"
+    restart: always
