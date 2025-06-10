@@ -8,7 +8,7 @@ import prices
 # This is fine because the Mongo port is not port forwarded
 MONGO_CONNECTION_STRING = 'mongodb://admin:admin@192.168.0.121'
 
-app = FastAPI()
+app = FastAPI(root_path="/finance-api")
 
 origins = ['*']
 
