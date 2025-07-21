@@ -26,7 +26,7 @@ async def get_fx_conversion_rate_from_alpha_vantage(currency: str) -> str:
         return str(fx_rate)
     
     except Exception as e:
-        await append_to_log('flask_logs', 'FINANCE', 'ERROR', f'Failed to get forex conversion rate from Alpha Vantage for currency {currency}. Error: {repr(e)}')
+        await append_to_log('ERROR', f'Failed to get forex conversion rate from Alpha Vantage for currency {currency}. Error: {repr(e)}')
         return None
     
 
@@ -190,6 +190,6 @@ async def get_stock_price_and_market_cap_gurufocus(response: Response, ticker: s
             return ''
 
     except Exception as e:
-        await append_to_log('flask_logs', 'FINANCE', 'ERROR', repr(e))
+        await append_to_log('ERROR', repr(e))
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return ''
