@@ -25,7 +25,7 @@ app.include_router(prices.router)
 
 async def log_access(request: Request):
     try:
-        url = 'https://cjremmett.com/finance-api/' + str(request.url.path)
+        url = 'https://cjremmett.com' + str(request.url.path)
         ip_address = request.client.host if request.client else "Unknown"
         await log_resource_access(url, ip_address)
     except Exception as e:
