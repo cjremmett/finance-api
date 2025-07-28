@@ -26,7 +26,7 @@ async def get_fx_conversion_rate_from_alpha_vantage(currency: str) -> str:
         return str(fx_rate)
     
     except Exception as e:
-        await append_to_log('flask_logs', 'FINANCE', 'ERROR', f'Failed to get forex conversion rate from Alpha Vantage for currency {currency}. Error: {repr(e)}')
+        await append_to_log('ERROR', f'Failed to get forex conversion rate from Alpha Vantage for currency {currency}. Error: {repr(e)}')
         return None
     
 
@@ -49,10 +49,10 @@ async def get_fx_rate_to_usd(response: Response, currency: str = Query(..., desc
         # Return the result.
         # VBA has trouble with JSON so just send straight text back since the use case for this is displaying data in Excel.
         if fx_rate != None:
-            await append_to_log('TRACE', 'Got forex conversion rate successfully for currency ' + currency + '.\n\nForex conversion rate: ' + fx_rate)
+            await append_to_log('TRACE', 'Got forex conversion rate successfully for currency ' + currency + '. Forex conversion rate: ' + fx_rate)
             return(fx_rate)
         else:
-            append_to_log('ERROR', 'Failed to get forex conversion successfully for currency ' + currency + '.\n\nForex conversion rate: ' + str(fx_rate))
+            append_to_log('ERROR', 'Failed to get forex conversion successfully for currency ' + currency + '.')
             return('')
 
     except Exception as e:
@@ -178,14 +178,14 @@ async def get_stock_price_and_market_cap_gurufocus(response: Response, ticker: s
         # Return the result.
         # VBA has trouble with JSON so just send straight text back since the use case for this is displaying data in Excel.
         if stock_price != None and market_cap != None:
-            await append_to_log('TRACE', f'Got native currency price and market cap successfully from GuruFocus for ticker {ticker}.\n\nStock price: {stock_price}\nMarket Cap: {market_cap}')
+            await append_to_log('TRACE', f'Got native currency price and market cap successfully from GuruFocus for ticker {ticker}. Stock price: {stock_price}, Market Cap: {market_cap}')
             return(stock_price + ',' + market_cap)
         # Handle ETFs where they have a price but no market cap
         elif stock_price != None and market_cap == None:
-            await append_to_log('TRACE', f'Got native currency price successfully from GuruFocus for ticker {ticker}.\n\nStock price: {stock_price}')
+            await append_to_log('TRACE', f'Got native currency price successfully from GuruFocus for ticker {ticker}. Stock price: {stock_price}')
             return(stock_price + ',' + 'N/A')
         else:
-            await append_to_log('ERROR', f'Failed to get stock price and market cap successfully for {ticker}.\n\nStock price: {str(stock_price)}\nMarket Cap: {str(market_cap)}')
+            await append_to_log('ERROR', f'Failed to get stock price and market cap successfully for {ticker}. Stock price: {str(stock_price)}, Market Cap: {str(market_cap)}')
             response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             return ''
 
