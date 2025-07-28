@@ -4,6 +4,7 @@ from utils import append_to_log, log_resource_access
 from fastapi.middleware.cors import CORSMiddleware
 import transcripts
 import prices
+import coinbase_tools
 
 # This is fine because the Mongo port is not port forwarded
 MONGO_CONNECTION_STRING = 'mongodb://admin:admin@192.168.0.121'
@@ -22,6 +23,7 @@ app.add_middleware(
 
 app.include_router(transcripts.router)
 app.include_router(prices.router)
+app.include_router(coinbase_tools.router)
 
 async def log_access(request: Request):
     try:

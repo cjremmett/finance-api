@@ -51,7 +51,7 @@ def on_message(msg):
             eth['perp_ask'] += msg['best_ask']
 
 
-@router.get("/write-crypto-futures-data", status_code=200)
+@router.post("/write-crypto-futures-data", status_code=200)
 async def write_crypto_futures_data(response: Response, token: Annotated[str | None, Header()] = None):
     try:
         if not authorized_via_finance_token(token):
