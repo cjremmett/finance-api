@@ -32,6 +32,7 @@ def write_crypto_future_data_to_postgres(coin_ticker, spot_bid, spot_ask, perp_b
 btc = DefaultDict(float)
 eth = DefaultDict(float)
 def on_message(msg):
+    append_to_log('TRACE', msg)
     if('product_id' in msg):
         if(msg['product_id'] == 'BTC-USD'):
             btc['spot_count'] += 1
@@ -69,7 +70,7 @@ async def write_crypto_futures_data(response: Response, token: Annotated[str | N
         client.open()
         client.subscribe(product_ids=["BTC-PERP-INTX", "BTC-USD", "ETH-PERP-INTX", "ETH-USD"], channels=["ticker"])
 
-        # wait 10 seconds
+        # wait 3 seconds
         time.sleep(3)
 
         # unsubscribe from the ticker channel and heartbeat channels for BTC-USD and ETH-USD, and close the connection
