@@ -1,6 +1,8 @@
 import redis
 import httpx
 import asyncio
+import time
+import sqlalchemy
 REDIS_HOST = '192.168.0.121'
 BASE_URL = 'https://cjremmett.com/logging'
 
@@ -55,3 +57,51 @@ async def log_resource_access(url: str, ip: str) -> None:
     headers = {'token': get_logging_microservice_token()}
     async with httpx.AsyncClient() as client:
         await client.post(BASE_URL + '/log-resource-access', json=json, headers=headers)
+
+
+def get_postgres_engine(database):
+   try:
+      # Postgres is not port forwarded so hardcoded login should be fine
+      return sqlalchemy.create_engine("postgresql+psycopg2://admin:pass@192.168.0.121:5432/" + database)
+   except Exception as e:
+      print('Getting Postgres engine failed. Error:' + repr(e))
+      raise Exception('Failed to get SQLAlchemy Postgres engine.')
+   
+
+def get_postgres_cursor_autocommit(database):
+   return get_postgres_engine(database).connect().execution_options(isolation_level="AUTOCOMMIT")
+
+
+def get_epoch_time():
+   return str(time.time())
+
+
+def get_calendar_datetime_utc_string():
+   return time.datetime.now(time.timezone.utc).strftime('%m/%d/%y %H:%M:%S')
+
+
+def get_postgres_timestamp_now() -> str:
+   # Use this function to get the timestamp string everywhere to ensure the format is consistent across functions and tables
+   return time.datetime.now(time.timezone.utc).strftime("%Y-%m-%d %H:%M:%S.%f")
+
+
+def get_postgres_date_now() -> str:
+   # Use this function to get the date string everywhere to ensure the format is consistent across functions and tables
+   # Use for date data type in Postgres
+   # e.g. 2024-06-15
+   return time.datetime.now(time.timezone.utc).strftime('%Y-%m-%d')
+
+
+def execute_postgres_query(query: str) -> None:
+   try:
+      with get_postgres_cursor_autocommit('cjremmett') as cursor:
+         cursor.execute(get_sqlalchemy_query_text(query))
+   except Exception as e:
+      append_to_log('ERROR', 'Exception thrown running the following SQL query:\n\n' + query + '\n\nError:' + repr(e))
+
+
+def get_sqlalchemy_query_text(query: str) -> sqlalchemy.sql.elements.TextClause:
+   try:
+      return sqlalchemy.text(query)
+   except Exception as e:
+      append_to_log('ERROR', repr(e))

@@ -190,6 +190,6 @@ async def get_stock_price_and_market_cap_gurufocus(response: Response, ticker: s
             return ''
 
     except Exception as e:
-        await append_to_log('flask_logs', 'FINANCE', 'ERROR', repr(e))
+        await append_to_log('ERROR', repr(e))
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return ''
