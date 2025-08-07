@@ -216,14 +216,22 @@ async def get_price_from_alpha_vantage(ticker: str) -> str:
     #         }
     #     }
     # }
-    try:     
+    try:
+        if('.HK' in ticker or '.T' in ticker):
+            return ''
         api_key = get_api_key('alpha_vantage')
         url = f'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&interval=1min&symbol={ticker}&apikey={api_key}'
         async with httpx.AsyncClient() as client:
             response = await client.get(url)
         resp_json = response.json()
-        print(resp_json)
-        price = resp_json['Time Series (1min)'][0][0][0]
+        time_series = resp_json.get('Time Series (1min)', {})
+        if not time_series:
+            await append_to_log('ERROR', f'No time series data for ticker {ticker}.')
+            return ''
+        # Get the latest timestamp
+        latest_timestamp = max(time_series.keys())
+        latest_data = time_series[latest_timestamp]
+        price = float(latest_data['4. close'])
         price = round(price, 2)
         return str(price)
     
@@ -292,7 +300,7 @@ async def get_market_cap_from_alpha_vantage(ticker: str) -> str:
     #     "ExDividendDate": "2025-08-08"
     # }
     try:
-        if('.HK' in ticker):
+        if('.HK' in ticker or '.T' in ticker):
             return ''
         
         api_key = get_api_key('alpha_vantage')
